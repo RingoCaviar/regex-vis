@@ -18,6 +18,34 @@
 
 [Contribution Guide](https://github.com/Bowen7/regex-vis/blob/master/.github/CONTRIBUTING.md)
 
+### Windows launcher
+
+Double-click `regex-vis.cmd` to open a persistent server-control menu. It can
+start the development server, open the browser, stop the server, show status and
+logs, and install dependencies. It automatically selects a free port starting
+at 5173.
+
+The same actions are available from a terminal:
+
+```powershell
+.\regex-vis.cmd start
+.\regex-vis.cmd status
+.\regex-vis.cmd stop
+```
+
+### Node.js 16 compatibility tests
+
+Prepare the repository-local Node.js 16 and pnpm test environment, then reuse
+it for later compatibility runs:
+
+```powershell
+.\test-node16.ps1 prepare
+.\test-node16.ps1 test
+.\test-node16.ps1 status
+```
+
+The downloaded runtime is stored in `.test-runtime` and is not committed.
+
 ## Feedback
 
 - [Report a bug](https://github.com/Bowen7/regex-vis/issues)

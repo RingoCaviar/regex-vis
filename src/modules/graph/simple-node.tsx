@@ -36,6 +36,7 @@ function SimpleNode({ x, y, node, selected }: Props) {
       <Content
         id={node.id}
         selected={selected}
+        draggable
         x={contentX}
         y={contentY}
         width={contentSize[0]}

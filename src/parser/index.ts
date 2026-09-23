@@ -7,4 +7,5 @@ export * from './modifiers'
 export * from './character-class'
 export * from './gen-with-selected'
 export * from './utils'
+export * from './move'
 export { AST }

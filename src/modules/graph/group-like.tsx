@@ -38,6 +38,7 @@ function GroupLikeNode({ x, y, node, selected }: Props) {
       <Content
         id={node.id}
         selected={selected}
+        draggable={selected}
         x={contentX}
         y={contentY}
         width={contentSize[0]}
@@ -45,6 +46,7 @@ function GroupLikeNode({ x, y, node, selected }: Props) {
         rx={GRAPH_NODE_BORDER_RADIUS}
         ry={GRAPH_NODE_BORDER_RADIUS}
         className={`stroke-[1.5] fill-transparent ${('negate' in node && node.negate ? 'stroke-red-500 [stroke-dasharray:4_2]' : 'stroke-graph-group')}`}
+        pointerEvents="all"
       >
         {nodeChildren.length > 0 && (
           <>

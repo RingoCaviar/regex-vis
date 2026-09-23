@@ -131,3 +131,6 @@ yarn-error.log*
 /export
 
 .swc
+
+# Repository-local runtimes used by compatibility tests
+/.test-runtime/

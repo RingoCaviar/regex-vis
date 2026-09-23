@@ -25,6 +25,7 @@ import {
   selectedIdsAtom,
   updateFlagsAtom,
 } from '@/atom'
+import { pushUndoAtom, refreshGroupAtom } from '@/atom/utils'
 import { useToast } from '@/components/ui/use-toast'
 import { Toggle } from '@/components/ui/toggle'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -36,6 +37,8 @@ function Home() {
   const selectIds = useAtomValue(selectedIdsAtom)
   const clearSelected = useSetAtom(clearSelectedAtom)
   const updateFlags = useSetAtom(updateFlagsAtom)
+  const pushUndo = useSetAtom(pushUndoAtom)
+  const refreshGroup = useSetAtom(refreshGroupAtom)
   const { t } = useTranslation()
   const { toast } = useToast()
   const [, copy] = useCopyToClipboard()
@@ -122,6 +125,12 @@ function Home() {
 
   const handleFlagsChange = (flags: string[]) => updateFlags(flags)
 
+  const handleMoveNodes = (nextAst: typeof ast) => {
+    pushUndo()
+    refreshGroup(nextAst)
+    setAst(nextAst)
+  }
+
   const handleCopyPermalink = () => {
     const permalink = genPermalink()
     copy(permalink)
@@ -144,7 +153,7 @@ function Home() {
               </div>
             )}
             <div className="flex items-center justify-center p-8 h-full">
-              <Graph regex={regex} ast={ast} errorMsg={errorMsg} />
+              <Graph ast={ast} errorMsg={errorMsg} onMoveNodes={handleMoveNodes} />
             </div>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "test": "vitest",
+    "test:launcher": "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File tests/launcher.test.ps1",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
