@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build:regexp2": "node scripts/build-regexp2.mjs",
     "start": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",

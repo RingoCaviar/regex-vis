@@ -29,6 +29,7 @@ import { pushUndoAtom, refreshGroupAtom } from '@/atom/utils'
 import { useToast } from '@/components/ui/use-toast'
 import { Toggle } from '@/components/ui/toggle'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { splitExpression } from '@/regex-engine/evaluate'
 
 function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -54,7 +55,9 @@ function Home() {
     () => searchParams.get(SEARCH_PARAM_REGEX) || '',
   )
 
-  const { literal } = ast
+  const rawExpression = splitExpression(regex, '')
+  const literal = errorMsg ? rawExpression.pattern !== regex : ast.literal
+  const effectiveFlags = errorMsg ? rawExpression.flags.split('') : ast.flags
 
   useEffect(() => {
     if (searchParams.get(SEARCH_PARAM_REGEX) === null) {
@@ -98,9 +101,11 @@ function Home() {
 
   useEffect(() => {
     // update url search
-    const nextParams: { r?: string } = {}
+    const nextParams = new URLSearchParams(window.location.search)
     if (regex !== '') {
-      nextParams.r = regex
+      nextParams.set(SEARCH_PARAM_REGEX, regex)
+    } else {
+      nextParams.delete(SEARCH_PARAM_REGEX)
     }
     setSearchParams(nextParams)
   }, [regex, setSearchParams])
@@ -123,7 +128,12 @@ function Home() {
     }
   }, [selectIds, graphTipVisible, setGraphTipVisible])
 
-  const handleFlagsChange = (flags: string[]) => updateFlags(flags)
+  const handleFlagsChange = (flags: string[]) => {
+    if (errorMsg)
+      setRegex(`/${rawExpression.pattern}/${flags.join('')}`)
+    else
+      updateFlags(flags)
+  }
 
   const handleMoveNodes = (nextAst: typeof ast) => {
     pushUndo()
@@ -132,7 +142,7 @@ function Home() {
   }
 
   const handleCopyPermalink = () => {
-    const permalink = genPermalink()
+    const permalink = genPermalink([], effectiveFlags.join(''))
     copy(permalink)
     toast({ description: t('Permalink copied.') })
   }
@@ -161,7 +171,7 @@ function Home() {
         <RegexInput
           regex={regex}
           literal={literal}
-          flags={ast.flags}
+          flags={effectiveFlags}
           onChange={setRegex}
           onFlagsChange={handleFlagsChange}
           onCopy={handleCopyPermalink}
@@ -176,7 +186,7 @@ function Home() {
           <ViewVerticalIcon />
         </Toggle>
       </div>
-      {regex !== null && <Editor defaultTab={editorDefaultTab} collapsed={editorCollapsed} />}
+      {regex !== null && <Editor defaultTab={editorDefaultTab} collapsed={editorCollapsed} regex={regex} flags={effectiveFlags.join('')} graphError={errorMsg} />}
     </div>
   )
 }

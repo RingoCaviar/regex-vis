@@ -5,4 +5,4 @@ export default antfu({ react: true, rules: {
   'style/brace-style': ['error', '1tbs'],
   'antfu/top-level-function': 'off',
   '@typescript-eslint/consistent-type-definitions': ['warn', 'type'],
-} })
+} }, { ignores: ['src/regex-engine/vendor/**'] })

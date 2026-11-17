@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { useTranslation } from 'react-i18next'
 import ASTGraph from './ast-graph'
 import { chooseDropCandidate } from './drop-candidate'
 import type { DropCandidate } from './drop-candidate'
@@ -55,6 +56,7 @@ function readDropPosition(target: SVGElement): DropPosition | null {
 }
 
 const Graph: React.FC<Props> = ({ ast, errorMsg = null, onMoveNodes }) => {
+  const { t } = useTranslation()
   const selectNodesByBox = useSetAtom(selectNodesByBoxAtom)
   const clearSelected = useSetAtom(clearSelectedAtom)
   const selectedIds = useAtomValue(selectedIdsAtom)
@@ -253,9 +255,10 @@ const Graph: React.FC<Props> = ({ ast, errorMsg = null, onMoveNodes }) => {
         ? (
             <Alert>
               <ExclamationTriangleIcon className="h-6 w-6" />
-              <AlertTitle className="!pl-10">Error</AlertTitle>
+              <AlertTitle className="!pl-10">{t('Graph unavailable')}</AlertTitle>
               <AlertDescription className="!pl-10">
-                {errorMsg}
+                <p>{t('This syntax cannot be visualized. Use the Test tab to check it with the selected engine.')}</p>
+                <p className="mt-2 font-mono text-xs break-words">{errorMsg}</p>
               </AlertDescription>
             </Alert>
           )

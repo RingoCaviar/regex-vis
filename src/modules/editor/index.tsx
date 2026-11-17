@@ -27,8 +27,11 @@ export type Tab = 'legend' | 'edit' | 'test'
 type Props = {
   defaultTab: Tab
   collapsed: boolean
+  regex: string
+  flags: string
+  graphError: string | null
 }
-function Editor({ defaultTab, collapsed }: Props) {
+function Editor({ defaultTab, collapsed, regex, flags, graphError }: Props) {
   const selectedIds = useAtomValue(selectedIdsAtom)
   const remove = useSetAtom(removeAtom)
   const undo = useSetAtom(undoAtom)
@@ -112,7 +115,7 @@ function Editor({ defaultTab, collapsed }: Props) {
                 <EditTab />
               </TabsContent>
               <TabsContent value="test">
-                <TestTab />
+                <TestTab regex={regex} flags={flags} graphError={graphError} />
               </TabsContent>
             </div>
           </ScrollArea>

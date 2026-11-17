@@ -16,6 +16,33 @@ when both are held). Box selection uses the modifier held when the drag starts.
 Non-consecutive nodes can be selected and deleted together; grouping, insertion,
 and other combined edits require consecutive nodes in the same sequence.
 
+### Matching engines
+
+Open the **Test** tab and select **Default (JavaScript)** or **Clash Verge
+(Mihomo)**. The choice is saved locally and included in copied test links.
+Mihomo mode runs the actual `regexp2 v1.12.0` engine as WebAssembly, using the
+same default options and backtick-separated filter alternatives as Mihomo.
+For example, `美国\b` matches `美国111` in JavaScript mode and does not match
+in Mihomo mode. Enter the regex value itself, without YAML keys or quotes.
+The editor also accepts `/pattern/flags` notation in either mode; copied links
+use this notation to retain checkbox flags.
+
+Both engines run locally in a worker. Tests have time limits so an expensive
+expression cannot freeze the page. The `i`, `m`, and `s` controls are supported;
+`g` does not change an existence test. Mihomo mode reports unsupported flags
+instead of approximating them. This tests the regex predicate, not provider
+inclusion, renaming, or other Clash configuration rules.
+
+The graph editor still supports its existing JavaScript syntax subset. If it
+cannot draw an expression (such as `(?i)us`), the Test tab evaluates the original
+input with the chosen engine and reports any engine errors separately.
+
+The compiled engine and runtime are checked in, so normal builds only need Node.
+To rebuild the WebAssembly asset with Go 1.24 or newer (the checked-in build uses
+Go 1.27.4), run `pnpm build:regexp2`. `GO_BINARY` can point to a specific Go binary.
+Sources, locked dependencies, and checksums are in `engines/regexp2`; third-party
+licenses accompany the runtime in `src/regex-engine/vendor`.
+
 ## Blog
 - [English](https://www.bowencodes.com/post/regex-vis_en)
 - [Chinese](https://www.bowencodes.com/post/regex-vis)

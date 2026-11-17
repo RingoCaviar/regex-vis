@@ -6,6 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { ViteEjsPlugin } from 'vite-plugin-ejs'
 
 export default defineConfig({
+  worker: { format: 'es' },
   base: '/',
   plugins: [react(), tsconfigPaths(), ViteEjsPlugin()],
   define: {
