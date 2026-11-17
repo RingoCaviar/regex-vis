@@ -2,6 +2,7 @@ import React from 'react'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { isPrimaryGraphAtom, selectNodeAtom } from '@/atom'
 import { GRAPH_NODE_BORDER_RADIUS } from '@/constants'
+import { getSelectionMode } from '@/utils/selection'
 
 type Props = {
   id: string
@@ -15,7 +16,7 @@ function Content({ id, selected, draggable = selected, children, ...restProps }:
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (isPrimaryGraph) {
-      selectNode(id)
+      selectNode(id, getSelectionMode(e))
     }
   }
   return (

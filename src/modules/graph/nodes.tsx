@@ -72,11 +72,6 @@ const Nodes = React.memo(({ id, index, x, y, nodes }: Props) => {
     }
   }, [index, id, contentBoxes, isPrimaryGraph])
 
-  const startSelectedIndex = useMemo(
-    () => nodes.findIndex(node => node.id === selectedIds[0]),
-    [selectedIds, nodes],
-  )
-
   const connectY = y + boxHeight / 2
 
   const dropXs = useMemo(() => {
@@ -142,10 +137,7 @@ const Nodes = React.memo(({ id, index, x, y, nodes }: Props) => {
       {nodes.map((node, index) => {
         const { id } = node
         const box = boxes[index]
-        const selected
-          = startSelectedIndex >= 0
-          && index >= startSelectedIndex
-          && index < startSelectedIndex + selectedIds.length
+        const selected = selectedIds.includes(id)
         let Node: ReactNode = null
         switch (node.type) {
           case 'choice':

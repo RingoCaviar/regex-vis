@@ -1,6 +1,8 @@
 import clsx from 'clsx'
 import { useRef, useState } from 'react'
 import { useEvent } from 'react-use'
+import { getSelectionMode } from '../selection'
+import type { SelectionMode } from '../selection'
 
 function captureClick(e: MouseEvent) {
   e.stopPropagation()
@@ -10,7 +12,7 @@ function captureClick(e: MouseEvent) {
 type Options = {
   disabled?: boolean
   className?: string
-  onSelect: (box: { x1: number, y1: number, x2: number, y2: number }) => void
+  onSelect: (box: { x1: number, y1: number, x2: number, y2: number }, mode: SelectionMode) => void
 }
 export function useDragSelect({
   disabled = false,
@@ -20,6 +22,7 @@ export function useDragSelect({
   const dragging = useRef(false)
   const moving = useRef(false)
   const pointerId = useRef<number | null>(null)
+  const mode = useRef<SelectionMode>('replace')
   const start = useRef<[number, number]>([0, 0])
   const [rect, setRect] = useState({ x: 0, y: 0, width: 0, height: 0 })
 
@@ -34,10 +37,10 @@ export function useDragSelect({
       return
     }
     const { x, y, width, height } = rect
-    if (Math.hypot(width, height) > 5) {
+    if (event.type !== 'pointercancel' && Math.hypot(width, height) > 5) {
       // prevent click event on node
       window.addEventListener('click', captureClick, true)
-      onSelect({ x1: x, y1: y, x2: x + width, y2: y + height })
+      onSelect({ x1: x, y1: y, x2: x + width, y2: y + height }, mode.current)
     }
     dragging.current = false
     pointerId.current = null
@@ -53,7 +56,7 @@ export function useDragSelect({
       if (disabled || (e.button !== 0 && e.button !== undefined)) {
         return
       }
-      if ((e.target as Element).closest('[data-drag-node-id]')) {
+      if (getSelectionMode(e) === 'replace' && (e.target as Element).closest('[data-drag-node-id]')) {
         return
       }
       const bounds = e.currentTarget.getBoundingClientRect()
@@ -61,6 +64,7 @@ export function useDragSelect({
       const offsetY = e.clientY - bounds.top
       dragging.current = true
       pointerId.current = e.pointerId
+      mode.current = getSelectionMode(e)
       start.current = [offsetX, offsetY]
     },
     onPointerMoveCapture: (e: React.PointerEvent<HTMLDivElement>) => {

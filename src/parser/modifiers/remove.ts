@@ -48,15 +48,11 @@ const removeFromList = (nodeList: AST.Node[], ids: string[]) => {
   nodeList.splice(index, ids.length)
 }
 
-export const removeSelected = (ast: AST.Regex, selectedIds: string[]) => {
-  if (selectedIds.length === 0) {
-    return
-  }
-
+const removeNode = (ast: AST.Regex, id: string) => {
   const paths: Path[] = []
-  visit(ast, selectedIds[0], paths, () => {
+  visit(ast, id, paths, () => {
     const { nodeList } = paths.pop()!
-    removeFromList(nodeList, selectedIds)
+    removeFromList(nodeList, [id])
     while (paths.length !== 0) {
       const { node, nodeList } = paths.pop()!
       if (
@@ -67,11 +63,17 @@ export const removeSelected = (ast: AST.Regex, selectedIds: string[]) => {
       }
       if (node.type === 'choice') {
         node.branches = node.branches.filter(branch => branch.length > 0)
-        if (node.branches.length === 1) {
+        if (node.branches.length === 0) {
+          removeFromList(nodeList, [node.id])
+        } else if (node.branches.length === 1) {
           replaceFromLists(nodeList, [node], node.branches[0])
         }
-        return
       }
     }
   })
+}
+
+export const removeSelected = (ast: AST.Regex, selectedIds: string[]) => {
+  for (const id of selectedIds)
+    removeNode(ast, id)
 }

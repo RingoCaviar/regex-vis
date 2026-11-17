@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import type * as AST from './ast'
 import { makeChoiceValid } from './modifiers/choice'
-import { getNodeById, visitNodes } from './visit'
+import { getContiguousNodesByIds, getNodeById, visitNodes } from './visit'
 
 export type DropPosition = {
   kind?: 'insert' | 'branch-before' | 'branch-after'
@@ -87,14 +87,10 @@ export function canMoveNodes(
   if (nodeIds.length === 0)
     return false
   try {
-    const first = getNodeById(ast, nodeIds[0])
-    const sourceIds = first.nodeList
-      .slice(first.index, first.index + nodeIds.length)
-      .map(node => node.id)
-    if (sourceIds.some((id, index) => id !== nodeIds[index]))
+    const sourceNodes = getContiguousNodesByIds(ast, nodeIds)
+    if (sourceNodes.length === 0)
       return false
-    if (first.nodeList.slice(first.index, first.index + nodeIds.length)
-      .some(node => containsContainer(node, position.containerId))) {
+    if (sourceNodes.some(node => containsContainer(node, position.containerId))) {
       return false
     }
     const target = getSequence(ast, position)

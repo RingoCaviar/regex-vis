@@ -5,7 +5,7 @@ import ASTGraph from './ast-graph'
 import { chooseDropCandidate } from './drop-candidate'
 import type { DropCandidate } from './drop-candidate'
 import type { AST, DropPosition } from '@/parser'
-import { canMoveNodes, getNodeById, moveNodes } from '@/parser'
+import { canMoveNodes, getContiguousNodesByIds, moveNodes } from '@/parser'
 import { clearSelectedAtom, selectNodesByBoxAtom, selectedIdsAtom } from '@/atom'
 import { useDragSelect } from '@/utils/hooks'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -29,17 +29,9 @@ type PendingDrag = DragState & { startX: number, startY: number }
 function contiguousDragIds(ast: AST.Regex, pressedId: string, selectedIds: string[]) {
   if (!selectedIds.includes(pressedId))
     return [pressedId]
-  try {
-    const first = getNodeById(ast, selectedIds[0])
-    const actual = first.nodeList
-      .slice(first.index, first.index + selectedIds.length)
-      .map(node => node.id)
-    return actual.every((id, index) => id === selectedIds[index])
-      ? selectedIds
-      : [pressedId]
-  } catch {
-    return [pressedId]
-  }
+  return getContiguousNodesByIds(ast, selectedIds).length > 0
+    ? selectedIds
+    : [pressedId]
 }
 
 function readDropPosition(target: SVGElement): DropPosition | null {
@@ -121,7 +113,7 @@ const Graph: React.FC<Props> = ({ ast, errorMsg = null, onMoveNodes }) => {
   }, [])
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (errorMsg || (event.button !== 0 && event.button !== undefined))
+    if (errorMsg || event.shiftKey || event.ctrlKey || (event.button !== 0 && event.button !== undefined))
       return
     const target = (event.target as Element).closest<SVGElement>('[data-drag-node-id]')
     const nodeId = target?.dataset.dragNodeId
@@ -236,7 +228,7 @@ const Graph: React.FC<Props> = ({ ast, errorMsg = null, onMoveNodes }) => {
   const [bindings, Selection] = useDragSelect({
     disabled: !!errorMsg,
     className: 'rounded bg-blue-500/50 border border-blue-500',
-    onSelect: box => selectNodesByBox(box),
+    onSelect: (box, mode) => selectNodesByBox(box, mode),
   })
 
   return (
@@ -252,7 +244,7 @@ const Graph: React.FC<Props> = ({ ast, errorMsg = null, onMoveNodes }) => {
           suppressClickRef.current = false
           event.preventDefault()
           event.stopPropagation()
-        } else if (!(event.target as Element).closest('[data-drag-node-id]')) {
+        } else if (!event.shiftKey && !event.ctrlKey && !(event.target as Element).closest('[data-drag-node-id]')) {
           clearSelected()
         }
       }}

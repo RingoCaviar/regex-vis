@@ -9,6 +9,19 @@ function regex(source: string) {
 }
 
 describe('moveNodes', () => {
+  it('rejects moving a selection spanning different branches as one block', () => {
+    const ast = regex('(a|b)c')
+    const group = ast.body[0]
+    if (group.type !== 'group' || group.children[0].type !== 'choice')
+      throw new Error('Unexpected fixture AST')
+    const choice = group.children[0]
+    const ids = [choice.branches[0][0].id, choice.branches[1][0].id]
+    const target = { containerId: ast.id, sequenceIndex: 0, index: 2 }
+    expect(canMoveNodes(ast, ids, target)).toBe(false)
+    expect(moveNodes(ast, ids, target)).toBeNull()
+    expect(gen(ast)).toBe('(a|b)c')
+  })
+
   it('checks drop validity without producing a moved AST', () => {
     const ast = regex('(a)b')
     const group = ast.body[0]

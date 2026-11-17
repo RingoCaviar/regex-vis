@@ -159,6 +159,20 @@ export function getNodesByIds(
   }
 }
 
+/** Returns nodes only when every ID belongs to one ordered, contiguous sequence. */
+export function getContiguousNodesByIds(ast: AST.Regex, ids: string[]): AST.Node[] {
+  if (ids.length === 0)
+    return []
+  try {
+    const { nodes } = getNodesByIds(ast, ids)
+    return nodes.length === ids.length && nodes.every((node, index) => node.id === ids[index])
+      ? nodes
+      : []
+  } catch {
+    return []
+  }
+}
+
 export function lrd(
   node: AST.Regex | AST.Node,
   callback: (node: AST.Regex | AST.Node) => void,

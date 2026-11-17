@@ -10,6 +10,12 @@
 - Visual editing of regular expressions
 - Testing of regular expressions.
 
+Graph selection supports clicking and dragging a selection box. Hold **Shift**
+to add nodes or **Ctrl** to remove nodes from the selection (Ctrl takes priority
+when both are held). Box selection uses the modifier held when the drag starts.
+Non-consecutive nodes can be selected and deleted together; grouping, insertion,
+and other combined edits require consecutive nodes in the same sequence.
+
 ## Blog
 - [English](https://www.bowencodes.com/post/regex-vis_en)
 - [Chinese](https://www.bowencodes.com/post/regex-vis)
